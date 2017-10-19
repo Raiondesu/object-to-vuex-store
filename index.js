@@ -1,5 +1,3 @@
-
-
 /**
  * Converts any plain js object
  * into a valid vuex store
@@ -8,14 +6,15 @@
  * 
  * @export objectToStore
  * @param {object} plainObject - Object to convert 
- * @param {boolean} [namespaced = false] - Whether or not to namespace the object
+ * @param {boolean} [namespaced = false] - Whether or not to namespace objects
  * @param {any} [modules = undefined] - Optional nested modules
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
 export function objectToStore(obj, namespaced = false, modules = undefined) {
   // Process modules first. Because it's easy and time-consuming.
-  for (let key in modules)
-    modules[key] = objectToStore(modules[key]);
+  if (isObject(modules))
+    for (let key in modules)
+      modules[key] = objectToStore(modules[key], namespaced);
 
   const filters = (function(_obj) {
     const __desc = prop => Object.getOwnPropertyDescriptor(_obj, prop);
@@ -53,7 +52,7 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
           result[key] = (context, payload) => {
             let args = undefined;
 
-            if (Object.prototype.toString.call(payload) === '[object Object]')
+            if (isObject(payload))
               args = getArgs(obj[key]).map(value => payload[value]);
 
             let thisArg = (({state, getters, ...other}) => ({ ...state, ...getters, ...other }))(context);
@@ -79,4 +78,8 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
     actions: filterObject(filters.action),
     modules: modules
   }
+}
+
+function isObject(obj) {
+  return Object.prototype.toString.call(object) === '[object Object]';
 }

@@ -1,0 +1,30 @@
+{
+  "name": "object-to-vuex-store",
+  "version": "0.5.2",
+  "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Raiondesu/object-to-vuex-store.git"
+  },
+  "keywords": [
+    "vue",
+    "vuex",
+    "object",
+    "convert",
+    "plain",
+    "JS",
+    "javascript",
+    "vuejs",
+    "store"
+  ],
+  "author": "Raiondesu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Raiondesu/object-to-vuex-store/issues"
+  },
+  "homepage": "https://github.com/Raiondesu/object-to-vuex-store#readme"
+}

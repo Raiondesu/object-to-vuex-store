@@ -42,78 +42,87 @@ const somePlainObject = {
 ## Example:
 
 ```js
-const user = {
-  // Each field that is a primitive, array or an object
-  // converts to state.store
+const user = objectToStore({
+    // Each field that is a primitive, array or an object
+    // converts to state.store
 
-  username: '',
-  email: '',
-  phone: '',
-  name: '',
+    username: '',
+    email: '',
+    phone: '',
+    name: '',
 
-  tokens: {
-    access: '',
-    refresh: ''
-  },
-  //
+    tokens: {
+      access: '',
+      refresh: ''
+    },
+    //
 
-  // Each getter GETTER_NAME converts into a vuex getter
-  get authorized () {
-    return this.tokens && this.tokens.access && this.tokens.access.length > 0;
-  },
+    // Each getter GETTER_NAME converts into a vuex getter
+    get authorized () {
+      return this.tokens && this.tokens.access && this.tokens.access.length > 0;
+    },
 
-  // Each setter SETTER_NAME converts into a vuex mutation
-  // and is accessible via store.commit('SETTER_NAME', payload)
-  set setUsername(value) {
-    this.username = value;
-  },
+    // Each setter SETTER_NAME converts into a vuex mutation
+    // and is accessible via store.commit('SETTER_NAME', payload)
+    set setUsername(value) {
+      this.username = value;
+    },
 
-  set setTokens(tokens) {
-    this.tokens = tokens;
-  },
-  //
+    set setTokens(tokens) {
+      this.tokens = tokens;
+    },
+    //
 
 
-  // Each method (async included) converts into a dispatchable vuex action
-  logout() {
-    window.localStorage.clear();
-    location.reload();
-  },
+    // Each method (async included) converts into a dispatchable vuex action
+    logout() {
+      window.localStorage.clear();
+      location.reload();
+    },
 
-  async signup(password) {
-    let this = self;
-    return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
-  },
+    async signup(password) {
+      let this = self;
+      return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
+    },
 
-  async signin(password) {
-    if (this.authorized)
+    async signin(password) {
+      if (this.authorized)
+          return true;
+
+      const url = '/oauth/token';
+
+      try {
+        let response = await http.post(url, encodeURI(`grant_type=password&username=${this.username}&password=${password}`));
+        let data = response.data;
+        this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
         return true;
-
-    const url = '/oauth/token';
-
-    try {
-      let response = await http.post(url, encodeURI(`grant_type=password&username=${this.username}&password=${password}`));
-      let data = response.data;
-		  this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
-			return true;
-    }
-    catch (e) {
-      console.log(e);
-      return false;
-    }
+      }
+      catch (e) {
+        console.log(e);
+        return false;
+      }
+    },
   },
-
-  // Special key that contains child modules
-  modules: {
+  true, 
+  // Special argument that contains child modules
+  {
     // You can put whatever objects you want here - they will be parsed into vuex modules recursively.
+    {
+      someModule: {
+        field: ''
+      }
+    }
   }
-}
+)
 ```
 
 translates to
 
 ```js
+// console.log(user):
+
 {
+  namespaced: true,
   state: {
     username: '',
     email: '',
@@ -170,7 +179,13 @@ translates to
   },
 
   modules: {
-    // Whatever you've put here in the original object.
+    // Whatever you've put here in the original argument.
+    someModule: {
+      namespaced: true,
+      state: {
+        field: ''
+      }
+    }
   }
 }
 ```
