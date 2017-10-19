@@ -81,5 +81,5 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
 }
 
 function isObject(obj) {
-  return !!object && Object.prototype.toString.call(object) === '[object Object]';
+  return Object.prototype.toString.call(obj) === '[object Object]';
 }
