@@ -3,7 +3,7 @@
   "version": "0.5.13",
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
   "main": "./index.js",
-  "module": "./esm/index.js",
+  "module": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel esm --out-dir .",
