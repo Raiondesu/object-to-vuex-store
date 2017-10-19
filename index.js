@@ -1,1 +1,85 @@
-'use strict';var _extends=Object.assign||function(a){for(var b,c=1;c<arguments.length;c++)for(var d in b=arguments[c],b)Object.prototype.hasOwnProperty.call(b,d)&&(a[d]=b[d]);return a};Object.defineProperty(exports,'__esModule',{value:!0});exports.objectToStore=objectToStore;function _objectWithoutProperties(a,b){var c={};for(var d in a)0<=b.indexOf(d)||Object.prototype.hasOwnProperty.call(a,d)&&(c[d]=a[d]);return c}function objectToStore(a){var c=1<arguments.length&&arguments[1]!==void 0&&arguments[1],d=2<arguments.length&&arguments[2]!==void 0?arguments[2]:void 0;function b(b){var c={},d=function(d){if(b(d))switch(b){case e.getter:c[d]=function(b){return Object.getOwnPropertyDescriptor(a,d).get.call(b)};break;case e.mutation:c[d]=function(b,c){return Object.getOwnPropertyDescriptor(a,d).set.call(b,c)};break;case e.action:c[d]=function(b,c){var e;isObject(c)&&(e=f(a[d]).map(function(a){return c[a]}));var g=function(a){var b=a.state,c=a.getters,d=_objectWithoutProperties(a,['state','getters']);return _extends({},b,c,d)}(b);return a[d].apply(g,e||[c])};break;case e.state:default:c[d]=a[d];}};for(var g in a)d(g);return c}if(isObject(d))for(var g in d)d[g]=objectToStore(d[g],c);var e=function(a){var b=function(b){return Object.getOwnPropertyDescriptor(a,b)},c=function(c){return!!a&&!!c&&!!b(c)},d=function(b){return'function'==typeof a[b]};return{state:function state(a){return c(a)&&!b(a).get&&!b(a).set&&!d(a)},getter:function getter(a){return c(a)&&b(a).get&&!b(a).set&&!d(a)},mutation:function mutation(a){return c(a)&&!b(a).get&&b(a).set&&!d(a)},action:function action(a){return c(a)&&d(a)}}}(a),f=function(a){return a.toString().match(/function\s.*?\(([^)]*)\)/)[1].split(',').map(function(a){return a.replace(/\/\*.*?\*\//,'').trim()}).filter(function(a){return a})};return{namespaced:c,state:b(e.state),getters:b(e.getter),mutations:b(e.mutation),actions:b(e.action),modules:d}}function isObject(){return'[object Object]'===Object.prototype.toString.call(object)}
+/**
+ * Converts any plain js object
+ * into a valid vuex store
+ * with state, getters, mutations, acitons
+ * and modules.
+ * 
+ * @export objectToStore
+ * @param {object} plainObject - Object to convert 
+ * @param {boolean} [namespaced = false] - Whether or not to namespace objects
+ * @param {any} [modules = undefined] - Optional nested modules
+ * @returns valid vuex store object for passing into a Vuex constructor.
+ */
+export function objectToStore(obj, namespaced = false, modules = undefined) {
+  // Process modules first. Because it's easy and time-consuming.
+  if (isObject(modules))
+    for (let key in modules)
+      modules[key] = objectToStore(modules[key], namespaced);
+
+  const filters = (function(_obj) {
+    const __desc = prop => Object.getOwnPropertyDescriptor(_obj, prop);
+    const __isValid    = prop => !!_obj && !!prop && !!__desc(prop);
+    const __isFunction = prop => typeof _obj[prop] === 'function';
+
+    return {
+      state: (prop) => __isValid(prop) && !__desc(prop).get && !__desc(prop).set && !__isFunction(prop),
+      getter: (prop) => __isValid(prop) && __desc(prop).get && !__desc(prop).set && !__isFunction(prop),
+      mutation: (prop) => __isValid(prop) && !__desc(prop).get && __desc(prop).set && !__isFunction(prop),
+      action: (prop) => __isValid(prop) && __isFunction(prop)
+    }
+  }(obj));
+
+  /// (c) by davidwalsh.name
+  const getArgs = (func) => func.toString()
+    .match(/function\s.*?\(([^)]*)\)/)[1].split(',') // Get args
+    .map(arg => arg.replace(/\/\*.*?\*\//, '').trim()) // Filter comments
+    .filter(arg => arg); // Filter undefined-s
+
+  function filterObject(filter) {
+    let result = {};
+
+    for (let key in obj) {
+      if (filter(key)) switch (filter) {
+        case filters.getter:
+          result[key] = (state) => Object.getOwnPropertyDescriptor(obj, key).get.call(state);
+          break;
+
+        case filters.mutation:
+          result[key] = (state, payload) => Object.getOwnPropertyDescriptor(obj, key).set.call(state, payload);
+          break;
+
+        case filters.action:
+          result[key] = (context, payload) => {
+            let args = undefined;
+
+            if (isObject(payload))
+              args = getArgs(obj[key]).map(value => payload[value]);
+
+            let thisArg = (({state, getters, ...other}) => ({ ...state, ...getters, ...other }))(context);
+
+            return obj[key].apply(thisArg, args || [payload]);
+          }
+          break;
+
+        case filters.state: default:
+          result[key] = obj[key];
+          break;
+      }
+    }
+
+    return result;
+  }
+
+  return {
+    namespaced,
+    state: filterObject(filters.state),
+    getters: filterObject(filters.getter),
+    mutations: filterObject(filters.mutation),
+    actions: filterObject(filters.action),
+    modules: modules
+  }
+}
+
+function isObject(obj) {
+  return Object.prototype.toString.call(object) === '[object Object]';
+}
