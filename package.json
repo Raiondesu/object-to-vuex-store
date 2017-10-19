@@ -2,9 +2,13 @@
   "name": "object-to-vuex-store",
   "version": "0.5.11",
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
-  "main": "index.js",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel esm --out-dir cjs",
+    "prepublishOnly": "npm run build",
+    "publish": "npm run build && npm version patch"
   },
   "repository": {
     "type": "git",
@@ -26,5 +30,24 @@
   "bugs": {
     "url": "https://github.com/Raiondesu/object-to-vuex-store/issues"
   },
-  "homepage": "https://github.com/Raiondesu/object-to-vuex-store#readme"
+  "homepage": "https://github.com/Raiondesu/object-to-vuex-store#readme",
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ]
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-babili": "^0.1.4",
+    "babel-preset-env": "^1.5.1",
+    "babel-register": "^6.24.1"
+  }
 }
