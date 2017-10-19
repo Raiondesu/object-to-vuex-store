@@ -1,6 +1,15 @@
 # object-to-vuex-store
 
 This is a small (<1KB gzipped) library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.
+It contains only one function: `objectToStore` that does all the job.
+
+## Parameters
+
+NAME        |  TYPE   |  DEFAULT  | DESCRIPTION
+----------- | ------  | --------- | -----------
+plainObject | object  |     -     | Object to convert
+namespaced  | boolean |   false   | Whether or not to namespace object and modules
+modules     | object  | undefined | Optional nested modules
 
 ## Installation & Usage
 
@@ -195,4 +204,3 @@ translates to
 ```
 
 with each field being mapped into state, each get function into a getter, set function into a mutation and all other funciton into actions.
-
