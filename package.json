@@ -7,8 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel esm --out-dir cjs",
-    "prepublishOnly": "npm run build",
-    "publish": "npm run build && npm version prerelease"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
