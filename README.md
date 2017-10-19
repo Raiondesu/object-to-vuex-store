@@ -58,12 +58,15 @@ const user = objectToStore({
     //
 
     // Each getter GETTER_NAME converts into a vuex getter
+    // Caveat: getters can only use state fields (not setters not methods),
+    // as prescribed by vuex itself.
     get authorized () {
       return this.tokens && this.tokens.access && this.tokens.access.length > 0;
     },
 
     // Each setter SETTER_NAME converts into a vuex mutation
     // and is accessible via store.commit('SETTER_NAME', payload)
+    // Caveat: setters can only see getters and fields, as prescribed by vuex itself.
     set setUsername(value) {
       this.username = value;
     },
@@ -75,6 +78,7 @@ const user = objectToStore({
 
 
     // Each method (async included) converts into a dispatchable vuex action
+    // Caveat: methods cannot use other methods, as prescribed by vuex.
     logout() {
       window.localStorage.clear();
       location.reload();
