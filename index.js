@@ -1,20 +1,14 @@
 /**
  * Converts any plain js object
  * into a valid vuex store
- * with state, getters, mutations, acitons
- * and modules.
+ * with state, getters, mutations and acitons.
  * 
  * @export objectToStore
  * @param {object} plainObject - Object to convert 
- * @param {boolean} [namespaced = false] - Whether or not to namespace objects
- * @param {any} [modules = undefined] - Optional nested modules
+ * @param {string} [namespace = undefined] - Optional object namespace
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
-export function objectToStore(obj, namespaced = false, modules = undefined) {
-  // Process modules first. Because it's easy and time-consuming.
-  if (isObject(modules))
-    for (let key in modules)
-      modules[key] = objectToStore(modules[key], namespaced);
+export function objectToStore(obj, namespace = undefined) {
 
   const filters = (function(_obj) {
     const __desc = prop => Object.getOwnPropertyDescriptor(_obj, prop);
@@ -29,11 +23,12 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
     }
   }(obj));
 
-  /// (c) by davidwalsh.name
-  const getArgs = (func) => func.toString()
-    .match(/function\s.*?\(([^)]*)\)/)[1].split(',') // Get args
-    .map(arg => arg.replace(/\/\*.*?\*\//, '').trim()) // Filter comments
-    .filter(arg => arg); // Filter undefined-s
+  const objGetters = {}, objBoth = {};
+  Object.entries(Object.getOwnPropertyDescriptors(obj))
+    .forEach(entry => {
+      !!entry[1].get && (objGetters[entry[0]] = entry[1]);
+      (!!entry[1].get || !!entry[1].set) && (objBoth[entry[0]] = entry[1]);
+    });
 
   function filterObject(filter) {
     let result = {};
@@ -41,23 +36,21 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
     for (let key in obj) {
       if (filter(key)) switch (filter) {
         case filters.getter:
-          result[key] = (state) => Object.getOwnPropertyDescriptor(obj, key).get.call(state);
+          const getter = Object.getOwnPropertyDescriptor(obj, key).get;
+          result[key] = (state) => getter.call(Object.defineProperties(state, objGetters));
           break;
 
         case filters.mutation:
-          result[key] = (state, payload) => Object.getOwnPropertyDescriptor(obj, key).set.call(state, payload);
+          const setter = Object.getOwnPropertyDescriptor(obj, key).set;
+          result[key] = (state, payload) => setter.call(Object.defineProperties(state, objBoth), payload);
           break;
-
+          
         case filters.action:
           result[key] = (context, payload) => {
-            let args = undefined;
-
-            if (isObject(payload))
-              args = getArgs(obj[key]).map(value => payload[value]);
-
-            let thisArg = (({state, getters, ...other}) => ({ ...state, ...getters, ...other }))(context);
-
-            return obj[key].apply(thisArg, args || [payload]);
+            const args = getArgs(obj[key]).map(value => payload[value]);
+            const thisArg = (({state, getters, ...other}) => (Object.assign(Object.defineProperties(state, objBoth), other)))(context);
+            
+            return obj[key].apply(thisArg, isObject(payload) ? args : [payload]);
           }
           break;
 
@@ -71,15 +64,21 @@ export function objectToStore(obj, namespaced = false, modules = undefined) {
   }
 
   return {
-    namespaced,
+    namespaced: namespace,
     state: filterObject(filters.state),
     getters: filterObject(filters.getter),
     mutations: filterObject(filters.mutation),
-    actions: filterObject(filters.action),
-    modules: modules
+    actions: filterObject(filters.action)
   }
 }
 
 function isObject(obj) {
-  return !!obj && Object.prototype.toString.call(obj) === '[object Object]';
+  return !!obj && obj.toString() === '[object Object]';
+}
+
+function getArgs(func) {
+  const comments = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+  const args = /([^\s,]+)/g;
+  let fnStr = func.toString().replace(comments, '');
+  return fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(args) || [];
 }

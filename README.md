@@ -67,7 +67,7 @@ const user = objectToStore({
     //
 
     // Each getter GETTER_NAME converts into a vuex getter
-    // Caveat: getters can only use state fields (not setters not methods),
+    // Caveat: getters can only use state fields and other getters (not setters nor methods),
     // as prescribed by vuex itself.
     get authorized () {
       return this.tokens && this.tokens.access && this.tokens.access.length > 0;
@@ -81,6 +81,12 @@ const user = objectToStore({
     },
 
     set setTokens(tokens) {
+      this.tokens = tokens;
+    },
+    
+    // Caveat: getters and setters cannot have equal names!
+    // this will override 'authorized' getter!
+    set authorized (tokens) {
       this.tokens = tokens;
     },
     //

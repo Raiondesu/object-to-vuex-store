@@ -4,8 +4,9 @@
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
   "main": "./index.js",
   "module": "./cjs/index.js",
+  "pre-commit": "npm test",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -R spec test/*-spec.js",
     "build": "babel ./index.js --out-dir ./cjs",
     "prepublishOnly": "npm run build"
   },
@@ -47,6 +48,9 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.5.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.24.1"
+    "babel-register": "^6.24.1",
+    "mocha": "^4.0.1",
+    "vue": "^2.5.2",
+    "vuex": "^3.0.0"
   }
 }
