@@ -144,31 +144,31 @@ translates to
     }
   },
   getters: {
-    'user/authorized'(state) {
+    'authorized'(state) {
       return state.tokens && state.tokens.access && state.tokens.access.length > 0;
     }
   },
   mutations: {
-    'user/setUsername'(state, value) {
+    'setUsername'(state, value) {
       state.username = value;
     },
 
-    'user/setTokens'(state, tokens) {
+    'setTokens'(state, tokens) {
       state.tokens = tokens;
     },
   },
   actions: {
-    'user/logout'() {
+    'logout'() {
       window.localStorage.clear();
       location.reload();
     },
 
-    async 'user/signup'(context, password) {
+    async 'signup'(context, password) {
       let self = context.state;
       return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
     },
 
-    async 'user/signin'(context, password) {
+    async 'signin'(context, password) {
       if (context.getters.authorized)
         return true;
 
@@ -189,4 +189,4 @@ translates to
 }
 ```
 
-with each field being mapped into state, each get function into a getter, set function into a mutation and all other funciton into actions.
+with each field being mapped into state, each get function into a getter, set function into a mutation and all other funcitons into actions.
