@@ -46,11 +46,11 @@ export function objectToStore(obj, namespace = undefined) {
           break;
           
         case filters.action:
+          const args = getArgs(obj[key]);
           result[key] = (context, payload) => {
-            const args = getArgs(obj[key]).map(value => payload[value]);
             const thisArg = (({state, getters, ...other}) => (Object.assign(Object.defineProperties(state, objBoth), other)))(context);
             
-            return obj[key].apply(thisArg, isObject(payload) ? args : [payload]);
+            return obj[key].apply(thisArg, isObject(payload) ? args.map(value => payload[value]) : [payload]);
           }
           break;
 
