@@ -50,7 +50,14 @@ export function objectToStore(obj, namespace = undefined) {
           result[key] = (context, payload) => {
             const thisArg = (({state, getters, ...other}) => (Object.assign(Object.defineProperties(state, objBoth), other)))(context);
             
-            return obj[key].apply(thisArg, isObject(payload) ? args.map(value => payload[value]) : [payload]);
+            const result = obj[key].apply(thisArg, isObject(payload) ? args.map(value => payload[value]) : [payload]);
+
+            delete context.state.dispatch;
+            delete context.state.commit;
+            delete context.state.rootState;
+            delete context.state.rootGetters;
+
+            return result;
           }
           break;
 

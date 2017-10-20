@@ -198,7 +198,7 @@ describe('objectToStore', function() {
 		}).catch(function(err) {console.assert(false, err)});
 
 		store.dispatch('getPrimitiveString').then(function (result) {
-			console.assert(result === object.primitiveString, 'primitiveString is not returned correctly');
+			console.assert(result === object.primitiveString, 'primitiveString is not returned correctly ', result);
 		}).catch(function(err) {console.assert(false, err)});
 
 		store.dispatch('addIntoNine', 90).then(function (result) {
@@ -254,5 +254,89 @@ describe('objectToStore', function() {
 		store.dispatch('object/addInto33', {number1: 40, number2: 59}).then(function(result) {
 			console.assert(result === 0, 'math is wrong again: ', result);
 		}).catch(function(err) {console.assert(false, err)});
+	})
+
+	it('is not recursive after dispatch', function() {
+		var _object = {
+			username: '',
+			email: '',
+			phone: '',
+			name: '',
+		  
+			tokens: {
+			  access: '',
+			  refresh: ''
+			},
+		  
+			get authorized () {
+			  return this.tokens && this.tokens.access && this.tokens.access.length > 0;
+			},
+		  
+			set setUsername(value) {
+			  this.username = value;
+			  if (value[0] === '+')
+				this.phone = value;
+			  else
+				this.email = value;
+			},
+		  
+			set setTokens(tokens) {
+			  this.tokens.access = tokens.access;
+			  this.tokens.refresh = tokens.refresh;
+			},
+		  
+			logout() {
+			  window.localStorage.clear();
+			  setTimeout(() => location.reload(), 200);
+			},
+		  
+			async signup(email, phoneNumber, firstName, password) {
+			  // TODO
+			  return await json.post('/signup', { username: email, phoneNumber, firstName, password });
+			},
+		  
+			async signin(password) {
+			  const url = '/oauth/token';
+			  const config = {
+				headers: {
+				  'Content-Type': 'application/x-www-form-urlencoded',
+				  Authorization: 'Basic a2F6YW5leHByZXNzOnNlY3JldEtleQ==',
+				  Accept: 'application/json'
+				}
+			  };
+		  
+			  try {
+				let data = { access_token: 'asdasd', refresh_token: 'dsadsa' };
+				this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
+				return true;
+			  }
+			  catch (e) {
+				console.log(e);
+				return false;
+			  }
+			}
+		}
+
+		function censor(censor) {
+			var i = 0;
+		  
+			return function(key, value) {
+				if(i !== 0 && typeof(censor) === 'object' && typeof(value) == 'object' && censor == value) 
+					return '[Circular]'; 
+			
+				if(i >= 29) // seems to be a harded maximum of 30 serialized objects?
+					return '[Unknown]';
+			
+				++i; // so we know we aren't using the original object anymore
+			
+				return value;  
+			}
+		}
+
+		var _str = new Vue({store: new Vuex.Store(objectToStore(_object))}).$store;
+
+		_str.dispatch('signin', 'asdasd')
+
+		console.assert(JSON.stringify(_str.state, censor(_str.state)).indexOf('[Circular]') === -1, 'JSON is again recursive for ', _str.state);
 	})
 })
