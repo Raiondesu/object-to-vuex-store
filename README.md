@@ -8,8 +8,7 @@ It contains only one function: `objectToStore` that does all the job.
 NAME        |  TYPE   |  DEFAULT  | DESCRIPTION
 ----------- | ------  | --------- | -----------
 plainObject | object  |     -     | Object to convert
-namespaced  | boolean |   false   | Whether or not to namespace object and modules
-modules     | object  | undefined | Optional nested modules
+namespace   | string  | undefined | Optional object namespace
 
 ## Installation & Usage
 
@@ -85,10 +84,10 @@ const user = objectToStore({
     },
     
     // Caveat: getters and setters cannot have equal names!
-    // this will override 'authorized' getter!
-    set authorized (tokens) {
-      this.tokens = tokens;
-    },
+    // this one would override the 'authorized' getter!
+    // set authorized (tokens) {
+    //   this.setTokens = tokens;
+    // },
     //
 
 
@@ -122,16 +121,7 @@ const user = objectToStore({
       }
     },
   },
-  true, 
-  // Special argument that contains child modules
-  {
-    // You can put whatever objects you want here - they will be parsed into vuex modules recursively.
-    {
-      someModule: {
-        field: ''
-      }
-    }
-  }
+  'user'
 )
 ```
 
@@ -154,31 +144,31 @@ translates to
     }
   },
   getters: {
-    authorized (state) {
+    'user/authorized'(state) {
       return state.tokens && state.tokens.access && state.tokens.access.length > 0;
     }
   },
   mutations: {
-    setUsername(state, value) {
+    'user/setUsername'(state, value) {
       state.username = value;
     },
 
-    setTokens(state, tokens) {
+    'user/setTokens'(state, tokens) {
       state.tokens = tokens;
     },
   },
   actions: {
-    logout() {
+    'user/logout'() {
       window.localStorage.clear();
       location.reload();
     },
 
-    async signup(context, password) {
+    async 'user/signup'(context, password) {
       let self = context.state;
       return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
     },
 
-    async signin(context, password) {
+    async 'user/signin'(context, password) {
       if (context.getters.authorized)
         return true;
 
@@ -193,16 +183,6 @@ translates to
       catch (e) {
         console.log(e);
         return false;
-      }
-    }
-  },
-
-  modules: {
-    // Whatever you've put here in the original argument.
-    someModule: {
-      namespaced: true,
-      state: {
-        field: ''
       }
     }
   }
