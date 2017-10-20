@@ -1,6 +1,6 @@
 {
   "name": "object-to-vuex-store",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
   "main": "./index.js",
   "module": "./cjs/index.js",
