@@ -35,7 +35,7 @@ const somePlainObject = {
   get Field() {
     return this.field;
   },
-  set Field(value) {
+  set setField(value) {
     this.field = value;
   },
   async setFieldAsync(value) {
