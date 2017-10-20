@@ -8,6 +8,8 @@ function isObject(obj) {
 
 describe('objectToStore', function() {
 	var objectToStore, Vue, Vuex;
+	var object, store;
+	
 	beforeEach(function() {
 		objectToStore = require('../cjs').objectToStore
 		Vue = require('vue')
@@ -16,7 +18,6 @@ describe('objectToStore', function() {
 	})
 
 	it('translates state', function() {
-		var object, state;
 		object = {
 			array: ['haha', 'ahah'],
 			someObj: {
@@ -30,7 +31,7 @@ describe('objectToStore', function() {
 			primitiveUndefined: undefined
 		};
 
-		state = objectToStore(object).state;
+		var state = objectToStore(object).state;
 
 		Object.keys(object).forEach(function(key) {
 			if (isPrimitive(state[key])) {
@@ -52,7 +53,6 @@ describe('objectToStore', function() {
 	})
 
 	it('translates getters', function() {
-		var object, store;
 		object = {
 			array: ['haha', 'ahah'],
 			someObj: {
@@ -76,12 +76,12 @@ describe('objectToStore', function() {
 		};
 
 
-		store = new Vue({store: new Vuex.Store(objectToStore(object))}).$store;
+		var getters = new Vue({store: new Vuex.Store(objectToStore(object))}).$store.getters;
 
-		var haha = store.getters.haha;
-		var nope = store.getters.nope;
-		var nine = store.getters.nine;
-		var thirtythree = store.getters.thirtythree;
+		var haha = getters.haha;
+		var nope = getters.nope;
+		var nine = getters.nine;
+		var thirtythree = getters.thirtythree;
 
 		console.assert(haha === object.haha, 'haha is not haha, haha is %s', haha);
 		console.assert(nope === object.nope, 'nope is not nope, nope is %s', nope);
@@ -90,7 +90,6 @@ describe('objectToStore', function() {
 	})
 
 	it('translates mutations', function() {
-		var object, store;
 		object = {
 			array: ['haha', 'ahah'],
 			someObj: {
@@ -133,12 +132,16 @@ describe('objectToStore', function() {
 		console.assert(store.state.someObj.value === -1, 'thirtythree must be -1 instead of ', store.state.someObj.value);
 	})
 
-	it('translates actions', function() {
+	beforeEach(function() {
+		objectToStore = require('../cjs').objectToStore
+		Vue = require('vue')
+		Vuex = require('Vuex')
+		Vue.use(Vuex)
+
 		function timeout(ms) {
 			return new Promise(resolve => setTimeout(resolve, ms));
 		}
-
-		var object, store;
+		
 		object = {
 			array: ['haha', 'ahah'],
 			someObj: {
@@ -172,20 +175,21 @@ describe('objectToStore', function() {
 				await timeout(1000);
 				return this.primitiveString;
 			},
-
+			
 			async addIntoNine(number) {
 				// await timeout(1000);
 				this.number = this.nine + number;
 				return this.nine;
 			},
-
+			
 			addInto33(/* the first number to add */number1, /* the secind number to add */number2) {
-				this.thirtythree = number1 + number2;
+				this.commit('thirtythree', number1 + number2);
 				return this.someObj.value;
 			}
 		};
-
-
+	})
+	
+	it('translates actions', function() {
 		store = new Vue({store: new Vuex.Store(objectToStore(object))}).$store;
 
 		var hehe = ['hehe'];
@@ -207,58 +211,6 @@ describe('objectToStore', function() {
 	})
 
 	it('supports module nesting', function() {
-		function timeout(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
-
-		var object, store;
-		object = {
-			array: ['haha', 'ahah'],
-			someObj: {
-				value: 42,
-				nope: 'nope'
-			},
-			primitiveString: 'haha',
-			primitiveNumber: 9,
-			get nine() {
-				return this.primitiveNumber;
-			},
-			set number(value) {
-				this.primitiveNumber = value;
-			},
-			set haha(value) {
-				return this.array[0] = value;
-			},
-			set nope(value) {
-				this.someObj.nope += value;
-			},
-			set thirtythree(value) {
-				this.someObj.value = value - this.nine;
-			},
-
-			concatArray(arr) {
-				this.array = this.array.concat(arr);
-				return this.array;
-			},
-
-			async getPrimitiveString() {
-				await timeout(1000);
-				return this.primitiveString;
-			},
-
-			async addIntoNine(number) {
-				// await timeout(1000);
-				this.number = this.nine + number;
-				return this.nine;
-			},
-
-			addInto33(/* the first number to add */number1, /* the secind number to add */number2) {
-				this.thirtythree = number1 + number2;
-				return this.someObj.value;
-			}
-		};
-
-
 		store = new Vue({store: new Vuex.Store({ modules: { object: objectToStore(object) } })}).$store;
 
 		console.assert(isObject(store.state.object), 'there\'re no modules... ', store.state);
@@ -282,58 +234,6 @@ describe('objectToStore', function() {
 	})
 
 	it('applies namespacing', function() {
-		function timeout(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
-
-		var object, store;
-		object = {
-			array: ['haha', 'ahah'],
-			someObj: {
-				value: 42,
-				nope: 'nope'
-			},
-			primitiveString: 'haha',
-			primitiveNumber: 9,
-			get nine() {
-				return this.primitiveNumber;
-			},
-			set number(value) {
-				this.primitiveNumber = value;
-			},
-			set haha(value) {
-				return this.array[0] = value;
-			},
-			set nope(value) {
-				this.someObj.nope += value;
-			},
-			set thirtythree(value) {
-				this.someObj.value = value - this.nine;
-			},
-
-			concatArray(arr) {
-				this.array = this.array.concat(arr);
-				return this.array;
-			},
-
-			async getPrimitiveString() {
-				await timeout(1000);
-				return this.primitiveString;
-			},
-
-			async addIntoNine(number) {
-				// await timeout(1000);
-				this.number = this.nine + number;
-				return this.nine;
-			},
-
-			addInto33(/* the first number to add */number1, /* the secind number to add */number2) {
-				this.commit('thirtythree', number1 + number2);
-				return this.someObj.value;
-			}
-		};
-
-
 		store = new Vue({store: new Vuex.Store({ modules: { object: objectToStore(object, 'object') } })}).$store;
 
 		console.assert(isObject(store.state.object), 'there\'re no modules... ', store.state);
