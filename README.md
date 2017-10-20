@@ -91,7 +91,7 @@ const user = objectToStore({
     //
 
 
-    // Each method (async included) converts into a dispatchable vuex action
+    // Each method (async included) is sconverted into a dispatchable vuex action
     // Caveat: methods cannot use other methods, as prescribed by vuex.
     logout() {
       window.localStorage.clear();
