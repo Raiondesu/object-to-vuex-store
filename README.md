@@ -190,3 +190,35 @@ translates to
 ```
 
 with each field being mapped into state, each get function into a getter, set function into a mutation and all other funcitons into actions.
+
+
+### ⚠️Warning⚠️
+To provide the described syntactic sugar this library invokes `Object.assign` and `Object.defineProperties` on each store method call (getter, mutation or action).
+If you extensively use long loops with getters, mutations or actions your application logic can suffer due to this limitation.
+If you are VERY concerned about performance - it's recommended either not to use this library or to move your loop logic inside the methods:
+
+**BAD**:
+```js
+// some .vue:
+for (let i = 0; i < 1000; i++)
+  this.$store.commit('increment');
+
+
+// store.js
+set increment() {
+  this.counter++;
+}
+```
+
+**GOOD**:
+```js
+//some .vue:
+this.$store.commit('incrementNTimes', 1000);
+
+// store.js
+set incrementNTimes(value) {
+  for (let i = 0; i < value; i++) {
+    this.counter++;
+  }
+}
+```

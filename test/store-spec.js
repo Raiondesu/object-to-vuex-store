@@ -182,8 +182,8 @@ describe('objectToStore', function() {
 				return this.nine;
 			},
 			
-			addInto33(/* the first number to add */number1, /* the secind number to add */number2) {
-				this.commit('thirtythree', number1 + number2);
+			addInto33(/* the first number to add */number1, /* the second number to add */number2) {
+				this.thirtythree = number1 + number2;
 				return this.someObj.value;
 			}
 		};
@@ -256,7 +256,7 @@ describe('objectToStore', function() {
 		}).catch(function(err) {console.assert(false, err)});
 	})
 
-	it('is not recursive after dispatch', function() {
+	it('does not add garbage', function() {
 		var _object = {
 			username: '',
 			email: '',
@@ -335,8 +335,8 @@ describe('objectToStore', function() {
 
 		var _str = new Vue({store: new Vuex.Store(objectToStore(_object))}).$store;
 
-		_str.dispatch('signin', 'asdasd')
-
-		console.assert(JSON.stringify(_str.state, censor(_str.state)).indexOf('[Circular]') === -1, 'JSON is again recursive for ', _str.state);
+		_str.dispatch('signin', 'asdasd').then(result => {
+			console.assert(JSON.stringify(_str.state, censor(_str.state)).indexOf('[Circular]') === -1, 'JSON is again recursive for ', _str.state);
+		})
 	})
 })

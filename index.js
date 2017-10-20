@@ -47,15 +47,15 @@ export function objectToStore(obj, namespace = undefined) {
           
         case filters.action:
           const args = getArgs(obj[key]);
-          result[key] = (context, payload) => {
+          result[key] = async function(context, payload) {
             const thisArg = (({state, getters, ...other}) => (Object.assign(Object.defineProperties(state, objBoth), other)))(context);
             
-            const result = obj[key].apply(thisArg, isObject(payload) ? args.map(value => payload[value]) : [payload]);
+            const result = await obj[key].apply(thisArg, isObject(payload) ? args.map(value => payload[value]) : [payload]);
 
-            delete context.state.dispatch;
-            delete context.state.commit;
-            delete context.state.rootState;
-            delete context.state.rootGetters;
+            context.state.dispatch = undefined;
+            context.state.commit = undefined;
+            context.state.rootState = undefined;
+            context.state.rootGetters = undefined;
 
             return result;
           }
