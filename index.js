@@ -64,7 +64,7 @@ export function objectToStore(obj, namespace = undefined) {
   }
 
   return {
-    namespaced: namespace,
+    namespaced: !!namespace,
     state: filterObject(filters.state),
     getters: filterObject(filters.getter),
     mutations: filterObject(filters.mutation),
