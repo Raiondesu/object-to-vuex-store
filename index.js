@@ -9,49 +9,46 @@
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
 export function objectToStore(obj, namespaced = false) {
-  const filters = createFilters(obj);
-
   return {
     namespaced: namespaced,
-    state: filterObject(filters.state),
-    getters: filterObject(filters.getter),
-    mutations: filterObject(filters.mutation),
-    actions: filterObject(filters.action)
+    state: filterObject(filters.state, obj),
+    getters: filterObject(filters.getter, obj),
+    mutations: filterObject(filters.mutation, obj),
+    actions: filterObject(filters.action, obj)
   }
 }
 
-function createFilters(_obj) {
-  const __desc = prop => Object.getOwnPropertyDescriptor(_obj, prop);
-  const __isValid    = prop => !!_obj && !!prop && !!__desc(prop);
-  const __isFunction = prop => typeof _obj[prop] === 'function';
+const filters = (function createFilters() {
+  const __desc = (_obj, prop) => Object.getOwnPropertyDescriptor(_obj, prop);
+  const __isValid    = (_obj, prop) => !!_obj && !!prop && !!__desc(_obj, prop);
+  const __isFunction = (_obj, prop) => typeof _obj[prop] === 'function';
 
   return {
-    state: prop => __isValid(prop) && !__desc(prop).get && !__desc(prop).set && !__isFunction(prop),
-    getter: prop => __isValid(prop) && __desc(prop).get && !__desc(prop).set && !__isFunction(prop),
-    mutation: prop => __isValid(prop) && !__desc(prop).get && __desc(prop).set && !__isFunction(prop),
-    action: prop => __isValid(prop) && __isFunction(prop)
+    state: (_obj, prop) => __isValid(_obj, prop) && !__desc(_obj, prop).get && !__desc(_obj, prop).set && !__isFunction(_obj, prop),
+    getter: (_obj, prop) => __isValid(_obj, prop) && __desc(_obj, prop).get && !__desc(_obj, prop).set && !__isFunction(_obj, prop),
+    mutation: (_obj, prop) => __isValid(_obj, prop) && !__desc(_obj, prop).get && __desc(_obj, prop).set && !__isFunction(_obj, prop),
+    action: (_obj, prop) => __isValid(_obj, prop) && __isFunction(_obj, prop)
   }
-}
+}());
 
-
-function filterObject(filter) {
+function filterObject(filter, _obj) {
   var result = {};
-  for (let key in obj) {
-    if (filter(key)) switch (filter) {
+  for (let key in _obj) {
+    if (filter(_obj, key)) switch (filter) {
       case filters.getter:
-        result[key] = () => obj[key];
+        result[key] = () => _obj[key];
         break;
 
       case filters.mutation:
-        result[key] = createMutation(obj, key);
+        result[key] = createMutation(_obj, key);
         break;
 
       case filters.action:
-        result[key] = createAction(obj, key);
+        result[key] = createAction(_obj, key);
         break;
         
       case filters.state: default:
-        createProp(result, obj, key);
+        createProp(result, _obj, key);
         break;
     }
   }
