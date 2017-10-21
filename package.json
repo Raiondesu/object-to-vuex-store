@@ -45,11 +45,11 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-minify": "^0.2.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.5.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",
-    "babili": "^0.1.4",
     "mocha": "^4.0.1",
     "vue": "^2.5.2",
     "vuex": "^3.0.0"
