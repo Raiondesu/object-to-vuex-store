@@ -1,5 +1,5 @@
 # object-to-vuex-store
-## [![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/index.common.js) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/index.common.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
+## [![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
 
 This is a small (<1KB gzipped) library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.

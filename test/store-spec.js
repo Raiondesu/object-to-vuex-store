@@ -11,7 +11,7 @@ describe('objectToStore', function() {
 	var object, store;
 	
 	beforeEach(function() {
-		objectToStore = require('../index.common.js').objectToStore
+		objectToStore = require('../dist').objectToStore
 		Vue = require('vue')
 		Vuex = require('vuex')
 		Vue.use(Vuex)
@@ -133,7 +133,7 @@ describe('objectToStore', function() {
 	})
 
 	beforeEach(function() {
-		objectToStore = require('../index.common.js').objectToStore
+		objectToStore = require('../dist').objectToStore
 		Vue = require('vue')
 		Vuex = require('vuex')
 		Vue.use(Vuex)

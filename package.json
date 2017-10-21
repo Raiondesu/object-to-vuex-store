@@ -3,11 +3,11 @@
   "version": "2.2.6",
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
   "main": "./index.js",
-  "module": "./index.common.js",
+  "module": "./dist/index.js",
   "pre-commit": "npm test",
   "scripts": {
     "test": "mocha -R spec test/*-spec.js",
-    "build": "babel ./index.js --out-file ./index.common.js",
+    "build": "babel ./index.js --out-dir ./dist",
     "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
