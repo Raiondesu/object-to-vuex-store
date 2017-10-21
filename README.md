@@ -19,6 +19,8 @@ that invoke setters and other functions from your original object.
 
 This way Vuex is tricked to think that it has its conventional object to work with, whereas it's just a warpper around the original plain JS object.
 
+All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object. And, plus, you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
+
 ## Installation & Usage
 
 ```bash
@@ -75,15 +77,12 @@ const user = objectToStore({
     //
 
     // Each getter GETTER_NAME converts into a vuex getter
-    // Caveat: getters can only use state fields and other getters (not setters nor methods),
-    // as prescribed by vuex itself.
     get authorized () {
       return this.tokens && this.tokens.access && this.tokens.access.length > 0;
     },
 
     // Each setter SETTER_NAME converts into a vuex mutation
     // and is accessible via store.commit('SETTER_NAME', payload)
-    // Caveat: setters can only see getters and fields, as prescribed by vuex itself.
     set setUsername(value) {
       this.username = value;
     },
@@ -101,7 +100,7 @@ const user = objectToStore({
 
 
     // Each method (async included) is converted into a dispatchable vuex action.
-    // Caveat: methods cannot use other methods, as prescribed by vuex.
+    
     logout() {
       window.localStorage.clear();
       location.reload();
