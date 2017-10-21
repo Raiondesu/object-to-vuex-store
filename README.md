@@ -100,15 +100,18 @@ const user = objectToStore({
     //
 
 
-    // Each method (async included) is sconverted into a dispatchable vuex action
+    // Each method (async included) is converted into a dispatchable vuex action.
     // Caveat: methods cannot use other methods, as prescribed by vuex.
     logout() {
       window.localStorage.clear();
       location.reload();
+      // Also you ca use rootGetters and rootState as if they were on your object:
+      console.log(this.rootState); // logs all root properties
+      console.log(this.rootGetters); // logs all root getters
     },
 
     async signup(password) {
-      let this = self;
+      let self = this;
       return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
     },
 
@@ -121,7 +124,9 @@ const user = objectToStore({
       try {
         let response = await http.post(url, encodeURI(`grant_type=password&username=${this.username}&password=${password}`));
         let data = response.data;
-        this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
+        this.setTokens = { access: data['access_token'], refresh: data['refresh_token'] };
+        // Might as well do:
+        this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });        
         return true;
       }
       catch (e) {
@@ -186,7 +191,7 @@ translates to
       try {
         let response = await http.post(url, encodeURI(`grant_type=password&username=${context.state.username}&password=${password}`));
         let data = response.data;
-        this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
+        context.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
         return true;
       }
       catch (e) {
