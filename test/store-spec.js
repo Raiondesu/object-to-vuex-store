@@ -13,7 +13,7 @@ describe('objectToStore', function() {
 	beforeEach(function() {
 		objectToStore = require('../cjs').objectToStore
 		Vue = require('vue')
-		Vuex = require('Vuex')
+		Vuex = require('vuex')
 		Vue.use(Vuex)
 	})
 
