@@ -11,32 +11,6 @@
 export function objectToStore(obj, namespaced = false) {
   const filters = createFilters(obj);
 
-  function filterObject(filter) {
-    var result = {};
-
-    for (let key in obj) {
-      if (filter(key)) switch (filter) {
-        case filters.getter:
-          result[key] = () => obj[key];
-          break;
-
-        case filters.mutation:
-          result[key] = createMutation(obj, key);
-          break;
-
-        case filters.action:
-          result[key] = createAction(obj, key);
-          break;
-          
-        case filters.state: default:
-          createProp(result, obj, key);
-          break;
-      }
-    }
-
-    return result;
-  }
-
   return {
     namespaced: namespaced,
     state: filterObject(filters.state),
@@ -52,11 +26,36 @@ function createFilters(_obj) {
   const __isFunction = prop => typeof _obj[prop] === 'function';
 
   return {
-    state: (prop) => __isValid(prop) && !__desc(prop).get && !__desc(prop).set && !__isFunction(prop),
-    getter: (prop) => __isValid(prop) && __desc(prop).get && !__desc(prop).set && !__isFunction(prop),
-    mutation: (prop) => __isValid(prop) && !__desc(prop).get && __desc(prop).set && !__isFunction(prop),
-    action: (prop) => __isValid(prop) && __isFunction(prop)
+    state: prop => __isValid(prop) && !__desc(prop).get && !__desc(prop).set && !__isFunction(prop),
+    getter: prop => __isValid(prop) && __desc(prop).get && !__desc(prop).set && !__isFunction(prop),
+    mutation: prop => __isValid(prop) && !__desc(prop).get && __desc(prop).set && !__isFunction(prop),
+    action: prop => __isValid(prop) && __isFunction(prop)
   }
+}
+
+
+function filterObject(filter) {
+  var result = {};
+  for (let key in obj) {
+    if (filter(key)) switch (filter) {
+      case filters.getter:
+        result[key] = () => obj[key];
+        break;
+
+      case filters.mutation:
+        result[key] = createMutation(obj, key);
+        break;
+
+      case filters.action:
+        result[key] = createAction(obj, key);
+        break;
+        
+      case filters.state: default:
+        createProp(result, obj, key);
+        break;
+    }
+  }
+  return result;
 }
 
 function createProp(obj, donor, key) {
