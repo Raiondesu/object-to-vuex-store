@@ -10,6 +10,15 @@ NAME        |  TYPE   |  DEFAULT  | DESCRIPTION
 plainObject | object  |     -     | Object to convert
 namespace   | string  | undefined | Optional object namespace
 
+## Description & Under the hood principles
+
+All this function does is it creates a 'wrapper' object around yours
+with getters and setters pointing to its properties
+and functions for getters, mutations and actions
+that invoke setters and other functions from your original object.
+
+This way Vuex is tricked to think that it has its conventional object to work with, whereas it's just a warpper around the original plain JS object.
+
 ## Installation & Usage
 
 ```bash

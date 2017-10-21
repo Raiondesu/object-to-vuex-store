@@ -183,7 +183,7 @@ describe('objectToStore', function() {
 			},
 			
 			addInto33(/* the first number to add */number1, /* the second number to add */number2) {
-				this.thirtythree = number1 + number2;
+				this.commit('thirtythree', number1 + number2);
 				return this.someObj.value;
 			}
 		};
