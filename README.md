@@ -1,4 +1,5 @@
 # object-to-vuex-store
+## ![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)
 
 This is a small (<1KB gzipped) library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
