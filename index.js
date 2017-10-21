@@ -19,37 +19,32 @@ export function objectToStore(obj, namespaced = false) {
 }
 
 const filters = (function createFilters() {
-  const __desc = (_obj, prop) => Object.getOwnPropertyDescriptor(_obj, prop);
-  const __isValid    = (_obj, prop) => !!_obj && !!prop && !!__desc(_obj, prop);
-  const __isFunction = (_obj, prop) => typeof _obj[prop] === 'function';
+  const __desc = (obj, prop) => Object.getOwnPropertyDescriptor(obj, prop);
+  const __isValid    = (obj, prop) => !!obj && !!prop && !!__desc(obj, prop);
+  const __isFunction = (obj, prop) => typeof obj[prop] === 'function';
 
   return {
-    state: (_obj, prop) => __isValid(_obj, prop) && !__desc(_obj, prop).get && !__desc(_obj, prop).set && !__isFunction(_obj, prop),
-    getter: (_obj, prop) => __isValid(_obj, prop) && __desc(_obj, prop).get && !__desc(_obj, prop).set && !__isFunction(_obj, prop),
-    mutation: (_obj, prop) => __isValid(_obj, prop) && !__desc(_obj, prop).get && __desc(_obj, prop).set && !__isFunction(_obj, prop),
-    action: (_obj, prop) => __isValid(_obj, prop) && __isFunction(_obj, prop)
+    state: (obj, prop) => __isValid(obj, prop) && !__desc(obj, prop).get && !__desc(obj, prop).set && !__isFunction(obj, prop),
+    getter: (obj, prop) => __isValid(obj, prop) && __desc(obj, prop).get && !__desc(obj, prop).set && !__isFunction(obj, prop),
+    mutation: (obj, prop) => __isValid(obj, prop) && !__desc(obj, prop).get && __desc(obj, prop).set && !__isFunction(obj, prop),
+    action: (obj, prop) => __isValid(obj, prop) && __isFunction(obj, prop)
   }
 }());
 
-function filterObject(filter, _obj) {
+function filterObject(filter, obj) {
   var result = {};
-  for (let key in _obj) {
-    if (filter(_obj, key)) switch (filter) {
-      case filters.getter:
-        result[key] = () => _obj[key];
-        break;
+  for (let key in obj) {
+    if (filter(obj, key)) {
+      if (filter === filters.getter)
+        result[key] = () => obj[key];
 
-      case filters.mutation:
-        result[key] = createMutation(_obj, key);
-        break;
+      else if (filter === filters.mutation)
+        result[key] = createMutation(obj, key);
 
-      case filters.action:
-        result[key] = createAction(_obj, key);
-        break;
-        
-      case filters.state: default:
-        createProp(result, _obj, key);
-        break;
+      else if (filter === filters.action)
+        result[key] = createAction(obj, key);
+
+      else createProp(result, obj, key);
     }
   }
   return result;
