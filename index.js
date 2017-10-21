@@ -5,10 +5,10 @@
  *
  * @export objectToStore
  * @param {object} plainObject - Object to convert
- * @param {string} [namespace = undefined] - Optional object namespace
+ * @param {boolean} [namespaced = false] - Optional object namespace
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
-export function objectToStore(obj, namespace = undefined) {
+export function objectToStore(obj, namespaced = false) {
   const filters = (function(_obj) {
     const __desc = prop => Object.getOwnPropertyDescriptor(_obj, prop);
     const __isValid    = prop => !!_obj && !!prop && !!__desc(prop);
@@ -69,7 +69,7 @@ export function objectToStore(obj, namespace = undefined) {
   }
 
   return {
-    namespaced: !!namespace,
+    namespaced: namespaced,
     state: filterObject(filters.state),
     getters: filterObject(filters.getter),
     mutations: filterObject(filters.mutation),
