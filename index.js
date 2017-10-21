@@ -19,15 +19,15 @@ export function objectToStore(obj, namespaced = false) {
 }
 
 const filters = (function createFilters() {
-  const __desc = (obj, prop) => Object.getOwnPropertyDescriptor(obj, prop);
-  const __isValid    = (obj, prop) => !!obj && !!prop && !!__desc(obj, prop);
-  const __isFunction = (obj, prop) => typeof obj[prop] === 'function';
+  const desc = (obj, prop) => Object.getOwnPropertyDescriptor(obj, prop);
+  const isValid    = (obj, prop) => !!obj && !!prop && !!desc(obj, prop);
+  const isFunction = (obj, prop) => typeof obj[prop] === 'function';
 
   return {
-    state: (obj, prop) => __isValid(obj, prop) && !__desc(obj, prop).get && !__desc(obj, prop).set && !__isFunction(obj, prop),
-    getter: (obj, prop) => __isValid(obj, prop) && __desc(obj, prop).get && !__desc(obj, prop).set && !__isFunction(obj, prop),
-    mutation: (obj, prop) => __isValid(obj, prop) && !__desc(obj, prop).get && __desc(obj, prop).set && !__isFunction(obj, prop),
-    action: (obj, prop) => __isValid(obj, prop) && __isFunction(obj, prop)
+    state: (obj, prop) => isValid(obj, prop) && !desc(obj, prop).get && !desc(obj, prop).set && !isFunction(obj, prop),
+    getter: (obj, prop) => isValid(obj, prop) && desc(obj, prop).get && !desc(obj, prop).set && !isFunction(obj, prop),
+    mutation: (obj, prop) => isValid(obj, prop) && !desc(obj, prop).get && desc(obj, prop).set && !isFunction(obj, prop),
+    action: (obj, prop) => isValid(obj, prop) && isFunction(obj, prop)
   }
 }());
 
