@@ -1,5 +1,5 @@
 # object-to-vuex-store
-## ![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master) ![size](https://badges.herokuapp.com/size/github/Raiondesu/object-to-vuex-store/master/cjs/index.js) ![size](https://badges.herokuapp.com/size/github/Raiondesu/object-to-vuex-store/master/cjs/index.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
+## [![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store/cjs/index.js) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store/cjs/index.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
 
 This is a small (<1KB gzipped) library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
@@ -105,7 +105,7 @@ const user = objectToStore({
     logout() {
       window.localStorage.clear();
       location.reload();
-      // Also you ca use rootGetters and rootState as if they were on your object:
+      // Also you can use rootGetters and rootState as if they were on your object:
       console.log(this.rootState); // logs all root properties
       console.log(this.rootGetters); // logs all root getters
     },
@@ -173,9 +173,11 @@ translates to
     },
   },
   actions: {
-    'user/logout'() {
+    'user/logout'(context) {
       window.localStorage.clear();
       location.reload();
+      console.log(context.rootState); // logs all root properties
+      console.log(context.rootGetters); // logs all root getters
     },
 
     async 'user/signup'(context, password) {
