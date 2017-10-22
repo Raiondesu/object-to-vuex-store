@@ -36,12 +36,12 @@ const filters = {
 };
 
 function defineProperty(obj, donor, key) {
-	Object.defineProperty(obj, key, {
-	  configurable: false,
-	  enumerable: true,
-	  get: () => donor[key],
-	  set: value => donor[key] = value
-	});
+  Object.defineProperty(obj, key, {
+    configurable: false,
+    enumerable: true,
+    get: () => donor[key],
+    set: value => donor[key] = value
+  });
 }
   
 function defineGetter(obj, donor, key) {
@@ -53,8 +53,8 @@ function defineMutation(obj, donor, key) {
 }
 
 function defineAction(obj, donor, key) {
-	let args = getArgs(donor[key]);
-	obj[key] = (context, payload) => {
+  let args = getArgs(donor[key]);
+  obj[key] = (context, payload) => {
     if (!donor.commit) {
       donor.commit = context.commit;
       donor.dispatch = context.dispatch;
