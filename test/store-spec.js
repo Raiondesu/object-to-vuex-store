@@ -185,6 +185,10 @@ describe('objectToStore', function() {
 			addInto33(/* the first number to add */number1, /* the second number to add */number2) {
 				this.commit('thirtythree', number1 + number2);
 				return this.someObj.value;
+			},
+
+			someObjAction(objectArgument) {
+				this.addIntoNine(objectArgument.number);
 			}
 		};
 	})
@@ -208,6 +212,8 @@ describe('objectToStore', function() {
 		store.dispatch('addInto33', {number1: 40, number2: 59}).then(function(result) {
 			console.assert(result === 0, 'math is wrong again: ', result);
 		}).catch(function(err) {console.assert(false, err)});
+
+		store.dispatch('someObjAction', {number: 40});
 	})
 
 	it('supports module nesting', function() {
