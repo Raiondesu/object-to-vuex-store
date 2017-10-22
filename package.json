@@ -1,6 +1,6 @@
 {
   "name": "object-to-vuex-store",
-  "version": "2.2.8",
+  "version": "2.2.9",
   "description": "Convert any JS object into a vuex object.",
   "main": "./src/index.js",
   "module": "./dist/index.js",
