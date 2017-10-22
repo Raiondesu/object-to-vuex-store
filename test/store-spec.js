@@ -68,7 +68,7 @@ describe('objectToStore', function() {
 				return this.someObj.nope;
 			},
 			get nine() {
-				return this.primitiveNumber
+				return this.primitiveNumber;
 			},
 			get thirtythree() {
 				return this.someObj.value - this.nine;

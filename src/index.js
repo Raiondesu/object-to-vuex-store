@@ -25,7 +25,7 @@ exports.objectToStore = function(plain, namespaced) {
     getters: filterObject(filters.getter, defineGetter),
     mutations: filterObject(filters.mutation, defineMutation),
     actions: filterObject(filters.action, defineAction)
-  }
+  };
 }
 
 const filters = {
@@ -61,8 +61,13 @@ function defineAction(obj, donor, key) {
       donor.rootState = context.rootState;
       donor.rootGetters = context.rootGetters;
     }
-    args = payload && payload.toString() === '[object Object]' ? args.map(value => payload[value]) : [payload];
-    return donor[key].apply(donor, args);
+    
+    return donor[key].apply(
+      donor,
+      payload && payload.toString() === '[object Object]' && args.length > 1 ?
+        args.map(arg => payload[arg]) :
+        [payload]
+    );
   }
 }
 
