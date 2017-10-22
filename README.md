@@ -27,29 +27,26 @@ import { objectToStore } from 'object-to-vuex-store'
 Vue.use(Vuex)
 
 export default new Vuex({
-  ...objectToStore(somePlainObject),
+  ...objectToStore({
+    field: '',
+    get Field() {
+      return this.field;
+    },
+    set setField(value) {
+      this.field = value;
+    },
+    async setFieldAsync(value, time) {
+      setTimeout(() => {
+        this.setField = value;
+      }, time);
+    }
+  }),
 
   modules: {
     // Yep, you can use it in here too!
     someModule: objectToStore(someOtherPlainObject, true)
   }
 })
-
-const somePlainObject = {
-  field: '',
-  get Field() {
-    return this.field;
-  },
-  set setField(value) {
-    this.field = value;
-  },
-  async setFieldAsync(value, time) {
-    setTimeout(() => {
-      this.setField = value;
-    }, time);
-  }
-}
-
 ```
 
 
