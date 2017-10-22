@@ -1,7 +1,7 @@
 # object-to-vuex-store
 ## [![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/ad0afa4b2bc44bbd3f57/maintainability)](https://codeclimate.com/github/Raiondesu/object-to-vuex-store/maintainability) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
 
-This is a small (<1KB gzipped) library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.
+This library provides a seamless translation from a plain JS-object into a vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
 
 ## Parameters
@@ -27,10 +27,14 @@ import { objectToStore } from 'object-to-vuex-store'
 Vue.use(Vuex)
 
 export default new Vuex({
-  ...objectToStore(somePlainObject)
+  ...objectToStore(somePlainObject),
+
+  modules: {
+    // Yep, you can use it in here too!
+    someModule: objectToStore(someOtherPlainObject, true)
+  }
 })
 
-//... See Example for more explanation.
 const somePlainObject = {
   field: '',
   get Field() {
@@ -39,174 +43,157 @@ const somePlainObject = {
   set setField(value) {
     this.field = value;
   },
-  async setFieldAsync(value) {
-    setTimeout((_this, _value) => {
-      _this.field = _value;
-    }, 1000, this, value);
+  async setFieldAsync(value, time) {
+    setTimeout(() => {
+      this.setField = value;
+    }, time);
   }
 }
 
 ```
 
-## Description & Under the hood principles
-
-All this function does is it creates a 'wrapper' object around yours
-with getters and setters pointing to its properties
-and functions for getters, mutations and actions
-that invoke setters and other functions from your original object.
-
-This way Vuex is tricked to think that it has its conventional object to work with, whereas it's just a warpper around the original plain JS object.
-
-All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object. And, plus, you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
-
-## Example:
 
 ```js
-const user = objectToStore({
-    // Each field that is a primitive, array or an object
-    // converts to state.store
+// some component.vue
+...
+await this.$store.dispatch('setFieldAsync', { value: 'foo', time: 1000 });
+console.log(this.$store.getters.Field) // logs "foo"
+...
 
-    username: '',
-    email: '',
-    phone: '',
-    name: '',
-
-    tokens: {
-      access: '',
-      refresh: ''
-    },
-    //
-
-    // Each getter GETTER_NAME converts into a vuex getter
-    get authorized () {
-      return this.tokens && this.tokens.access && this.tokens.access.length > 0;
-    },
-
-    // Each setter SETTER_NAME converts into a vuex mutation
-    // and is accessible via store.commit('SETTER_NAME', payload)
-    set setUsername(value) {
-      this.username = value;
-    },
-
-    set setTokens(tokens) {
-      this.tokens = tokens;
-    },
-    
-    // Caveat: getters and setters cannot have equal names!
-    // this one would override the 'authorized' getter!
-    // set authorized (tokens) {
-    //   this.setTokens = tokens;
-    // },
-    //
-
-
-    // Each method (async included) is converted into a dispatchable vuex action.
-    
-    logout() {
-      window.localStorage.clear();
-      location.reload();
-      // Also you can use rootGetters and rootState as if they were on your object:
-      console.log(this.rootState); // logs all root properties
-      console.log(this.rootGetters); // logs all root getters
-    },
-
-    async signup(password) {
-      let self = this;
-      return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
-    },
-
-    async signin(password) {
-      if (this.authorized)
-          return true;
-
-      const url = '/oauth/token';
-
-      try {
-        let response = await http.post(url, encodeURI(`grant_type=password&username=${this.username}&password=${password}`));
-        let data = response.data;
-        this.setTokens = { access: data['access_token'], refresh: data['refresh_token'] };
-        // Might as well do:
-        this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });        
-        return true;
-      }
-      catch (e) {
-        console.log(e);
-        return false;
-      }
-    },
-  },
-  // namespaced:
-  true
-)
 ```
 
-translates to
+## Description & under-the-hood principles
+
+See [Example](#Deep-Example) for more practical explanation on how things really work under the hood.
+
+All this function does is it creates a 'wrapper' object around yours, capturing it in memory.  
+Every property on your object is mapped via a getter/setter pair.  
+Every getter is mapped to a vuex getter function.  
+Every setter - to a mutation function.  
+And every plain function - to a vuex action function.  
+Due to this "referencing" this lib adds little to no difference in both memory and performance compared to plain vuex,
+while maintaining consistency and simplicity of plain JS objects.  
+This way Vuex is tricked to think that it has just its conventional object to work with,
+whereas it just calls functions that internally reference your object.
+
+All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object.  
+More than that - you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
+
+### Deep-Example:
 
 ```js
-// console.log(user):
+const somePlainObject = {
+  // Each field that is a primitive, array or an object
+  // converts to state.store
+  array: [ 'foo', 'bar' ],
+  field: '',
 
+  // Each getter GETTER_NAME converts into a vuex getter
+  get Foo() {
+    return this.array[0];
+  },
+
+  // Getter as "computed property" with additional argument
+  get ArrayElement() {
+    return index => this.array[index];
+  }
+
+  // Each setter SETTER_NAME converts into a vuex mutation
+  // and is accessible via store.commit('SETTER_NAME', payload)
+  set AddToArray(value) {
+    this.array.push(value);
+  },
+
+  // Caveat: getters and setters cannot have equal names!
+  // this one would override the 'Foo' getter!
+  // set Foo(value) {
+  //   return this.array[0] = value;
+  // },
+
+  // Each method (async included) is converted into a dispatchable vuex action.
+  async AddToArrayAsync(value, time) {
+    setTimeout(() => {
+      // You can do this:
+      this.AddToArray = value;
+      // vuex will not register this as a commit,
+      // while still updating the storage, whatsoever.
+
+      // but you might as well do:
+      this.commit('AddToArray', value);
+      // since there is no practical difference.
+    }, time);
+
+    // Also you can use rootGetters, rootState, commit and dispatch,
+    // as if they were on your object:
+    console.log(this.rootState);    // logs all root properties
+    console.log(this.rootGetters);  // logs all root getters
+    console.log(this.commit);       // logs function boundCommit(type, payload) {}
+    console.log(this.dispatch);     // logs function boundDispatch(type, payload) {}
+  },
+
+  // Vuex's "natural" object arguments work too
+  async AwaitAddToArray({ value, time }) {
+    // Yes, it works. *looking at vuex with judging eyes*
+    await this.dispatch('AddToArrayAsync', { value, time });
+
+    // as well as this:
+    await this.AddToArrayAsync(value, time);
+  }
+}
+
+```
+
+```js
+const storeObject = objectToStore(somePlainObject, /*namespaced:*/ false);
+
+// storeObject is something like this:
 {
-  namespaced: true,
+  namespaced: false,
+
+  // All getters and setters are enumerable,
+  // i.e. treated by JS and Vuex as plain simple variables.
   state: {
-    username: '',
-    email: '',
-    phone: '',
-    name: '',
+    get field() { return somePlainObject.field; },
+    set field(value) { return somePlainObject.field = value; },
 
-    tokens: {
-      access: '',
-      refresh: ''
-    }
+    get array() { return somePlainObject.array; },
+    set array(value) { return somePlainObject.array = value; },
   },
+
   getters: {
-    'user/authorized'(state) {
-      return state.tokens && state.tokens.access && state.tokens.access.length > 0;
+    Foo: (state, getters) => somePlainObject.Foo,
+    ArrayElement: (state, getters) => somePlainObject.ArrayElement;
+    // which returnes a lambda for `ArrayElement(index)` syntax:
+    // this.$store.getters.ArrayElement(1), for example, returns "bar"
+  },
+
+  mutations: {
+    AddToArray(state, value) {
+      // It's not literally like this but the principle is the same,
+      // with difference being that the setter is binded BEFORE invocation
+      // which helps to maintain the same anout of real computational operations.
+      somePlainObject.AddToArray.setter.call(somePlainObject, value);
     }
   },
-  mutations: {
-    'user/setUsername'(state, value) {
-      state.username = value;
-    },
 
-    'user/setTokens'(state, tokens) {
-      state.tokens = tokens;
-    },
-  },
+  // Actions are as simple as that:
   actions: {
-    'user/logout'(context) {
-      window.localStorage.clear();
-      location.reload();
-      console.log(context.rootState); // logs all root properties
-      console.log(context.rootGetters); // logs all root getters
+    async AddToArrayAsync(context, { value, time }) {
+      somePlainObject.AddToArrayAsync(value, time);
     },
-
-    async 'user/signup'(context, password) {
-      let self = context.state;
-      return await json.post('/signup', { username: self.email, phoneNumber: self.phone, firstName: self.name, password });
-    },
-
-    async 'user/signin'(context, password) {
-      if (context.getters.authorized)
-        return true;
-
-      const url = '/oauth/token';
-
-      try {
-        let response = await http.post(url, encodeURI(`grant_type=password&username=${context.state.username}&password=${password}`));
-        let data = response.data;
-        context.commit('user/setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
-        return true;
-      }
-      catch (e) {
-        console.log(e);
-        return false;
-      }
+    async AwaitAddToArray(context, payload) {
+      somePlainObject.AwaitAddToArray(payload);
     }
   }
 }
 ```
 
-with each field being mapped into state, each get function into a getter, set function into a mutation and all other funcitons into actions.
+Notice how all the fields and methods reference the original object.
+This, though, doesn't mean that it should be defined separately.
+
+Notation like
+`const store = objectToStore({ /* some fields and methods here */ })`
+will work exactly the same.
 
 -----
 
