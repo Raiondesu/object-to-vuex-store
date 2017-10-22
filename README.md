@@ -207,3 +207,7 @@ translates to
 ```
 
 with each field being mapped into state, each get function into a getter, set function into a mutation and all other funcitons into actions.
+
+-----
+
+© 2017 Alexey "Raiondesu" Iskhakov

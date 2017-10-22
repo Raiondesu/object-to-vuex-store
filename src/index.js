@@ -1,5 +1,5 @@
 /** (c) Raiondesu
- * @license ISC
+ * @license MIT
  * 
  * Converts any plain js object
  * into a valid vuex store
