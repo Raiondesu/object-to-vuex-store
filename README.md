@@ -11,17 +11,6 @@ NAME        |  TYPE    |  DEFAULT  | DESCRIPTION
 plainObject | object   |     -     | Object to convert
 namespace   | boolean  |   false   | Whether to namespace the object
 
-## Description & Under the hood principles
-
-All this function does is it creates a 'wrapper' object around yours
-with getters and setters pointing to its properties
-and functions for getters, mutations and actions
-that invoke setters and other functions from your original object.
-
-This way Vuex is tricked to think that it has its conventional object to work with, whereas it's just a warpper around the original plain JS object.
-
-All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object. And, plus, you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
-
 ## Installation & Usage
 
 ```bash
@@ -58,6 +47,17 @@ const somePlainObject = {
 }
 
 ```
+
+## Description & Under the hood principles
+
+All this function does is it creates a 'wrapper' object around yours
+with getters and setters pointing to its properties
+and functions for getters, mutations and actions
+that invoke setters and other functions from your original object.
+
+This way Vuex is tricked to think that it has its conventional object to work with, whereas it's just a warpper around the original plain JS object.
+
+All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object. And, plus, you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
 
 ## Example:
 
