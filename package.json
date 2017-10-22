@@ -2,12 +2,12 @@
   "name": "object-to-vuex-store",
   "version": "2.2.7",
   "description": "A small library that provides a seamless conversion from a plain JS-object into a vuex-valid store/module.",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "module": "./dist/index.js",
   "pre-commit": "npm test",
   "scripts": {
     "test": "mocha -R spec test/*-spec.js",
-    "build": "babel ./index.js --out-dir ./dist",
+    "build": "babel ./src --out-dir ./dist",
     "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
@@ -44,10 +44,9 @@
     ]
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
+    "babel-cli": "^6.26.0",
     "babel-minify": "^0.2.0",
-    "babel-preset-env": "^1.5.1",
-    "babel-register": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "mocha": "^4.0.1",
     "vue": "^2.5.2",
     "vuex": "^3.0.0"
