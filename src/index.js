@@ -3,7 +3,7 @@
  */
 /**
  * Converts any plain js object
- * into a valid vuex store
+ * into a valid vuex store object
  * with state, getters, mutations and acitons.
  *
  * @export objectToStore
@@ -15,18 +15,20 @@ exports.objectToStore = function(plain, namespaced) {
   function filterBy(wrap) {
     var result = {};
     for (let key in plain)
-      wrap(result, plain, key);
+    wrap(result, plain, key);
     return result;
   }
-
+  
   return {
-    namespaced: namespaced,
+    namespaced,
     state: filterBy(state),
     getters: filterBy(getter),
     mutations: filterBy(mutation),
     actions: filterBy(action)
   };
 }
+
+let desc = Object.getOwnPropertyDescriptor;
 
 function state(obj, donor, key) {
   if (!desc(donor, key).get && !desc(donor, key).set)
@@ -49,8 +51,16 @@ function mutation(obj, donor, key) {
 }
 
 function action(obj, donor, key) {
-  if (typeof donor[key] === 'function') {
-    let args = getArgs(donor[key]);
+  if (donor[key] instanceof Function) {
+    // Regex to filter out comments:
+    const commentsRegex = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    // Regex to filter args:
+    const argsRegex = /([^\s,]+)/g;
+
+    // Exctract arguments array from a function:
+    let fnStr = donor[key].toString().replace(commentsRegex, '');
+    let args = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(argsRegex) || [];
+
     obj[key] = (context, payload) => {
       if (!donor.commit) {
         donor.commit = context.commit;
@@ -61,21 +71,10 @@ function action(obj, donor, key) {
       
       return donor[key].apply(
         donor,
-        payload && payload.toString() === '[object Object]' && args.length > 1 ?
+        payload === Object(payload) && args.length > 1 ?
           args.map(arg => payload[arg]) :
           [payload]
       );
     }
   }
-}
-
-function getArgs(func) {
-  const comments = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-  const args = /([^\s,]+)/g;
-  let fnStr = func.toString().replace(comments, '');
-  return fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(args) || [];
-}
-
-function desc(obj, prop) {
-  return Object.getOwnPropertyDescriptor(obj, prop);
 }

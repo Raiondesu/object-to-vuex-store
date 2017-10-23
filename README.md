@@ -1,7 +1,7 @@
 # object-to-vuex-store
 ## [![Travis branch](https://img.shields.io/travis/Raiondesu/object-to-vuex-store/master.svg?style=flat-square)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square&gzip=true) [![David](https://img.shields.io/david/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![David](https://img.shields.io/david/dev/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dt/object-to-vuex-store.svg?style=flat-square)](http://npmjs.com/package/object-to-vuex-store)
 
-This library provides a seamless translation from a plain JS-object into a vuex-valid store/module.
+This library provides a seamless conversion from a plain JS-object into a Vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
 
 ## Parameters
