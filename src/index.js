@@ -1,13 +1,14 @@
 /** (c) Raiondesu
  * @license MIT
- * 
+ */
+/**
  * Converts any plain js object
  * into a valid vuex store
  * with state, getters, mutations and acitons.
  *
  * @export objectToStore
  * @param {object} plain - Object to convert
- * @param {boolean} [namespaced = false] - Optional object namespace
+ * @param {boolean} [namespaced = false] - Whether to namespace the object
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
 exports.objectToStore = function(plain, namespaced) {
