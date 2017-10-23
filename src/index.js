@@ -15,7 +15,7 @@ exports.objectToStore = function(plain, namespaced) {
   function filterBy(wrap) {
     var result = {};
     for (let key in plain)
-    wrap(result, plain, key);
+      wrap(result, plain, key);
     return result;
   }
   
