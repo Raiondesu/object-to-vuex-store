@@ -57,8 +57,7 @@ this.$store.dispatch('setFieldAsync', { value: 'foo', time: 1000 }).then(() => {
 
 ```
 
-### Conversion schema:
-(regarding the above example)  
+### Conversion schema (regarding the above example):
 Input object field (plain) | Output object field (store)
 ---------------------------|---------------
 field: ''                  | state.field  [get/set]  
