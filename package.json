@@ -14,11 +14,6 @@
     "type": "git",
     "url": "git+https://github.com/Raiondesu/object-to-vuex-store.git"
   },
-  "files": [
-    "./src",
-    "./dist",
-    ".babelrc"
-  ],
   "keywords": [
     "vue",
     "vuex",
