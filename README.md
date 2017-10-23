@@ -1,5 +1,5 @@
 # object-to-vuex-store
-## [![build](https://travis-ci.org/Raiondesu/object-to-vuex-store.svg?branch=master)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?gzip=true) ![deps](https://david-dm.org/Raiondesu/object-to-vuex-store.svg) [![Maintainability](https://api.codeclimate.com/v1/badges/ad0afa4b2bc44bbd3f57/maintainability)](https://codeclimate.com/github/Raiondesu/object-to-vuex-store/maintainability) [![HitCount](http://hits.dwyl.io/raiondesu/object-to-vuex-store.svg)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
+## [![Travis branch](https://img.shields.io/travis/Raiondesu/object-to-vuex-store/master.svg?style=flat-square)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square&gzip=true) [![David](https://img.shields.io/david/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![David](https://img.shields.io/david/dev/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dt/object-to-vuex-store.svg?style=flat-square)](http://hits.dwyl.io/Raiondesu/object-to-vuex-store)
 
 This library provides a seamless translation from a plain JS-object into a vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
@@ -61,7 +61,7 @@ console.log(this.$store.getters.Field) // logs "foo"
 
 ## Description & under-the-hood principles
 
-See [Example](#Deep-Example) for more practical explanation on how things really work under the hood.
+See [Example](#deep-example) for more practical explanation on how things really work under the hood.
 
 All this function does is it creates a 'wrapper' object around yours, capturing it in memory.  
 Every property on your object is mapped via a getter/setter pair.  
@@ -76,7 +76,7 @@ whereas it just calls functions that internally reference your object.
 All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object.  
 More than that - you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
 
-### Deep-Example:
+### Deep-Example
 
 ```js
 const somePlainObject = {
