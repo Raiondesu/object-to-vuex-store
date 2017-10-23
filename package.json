@@ -7,13 +7,18 @@
   "pre-commit": "npm test",
   "scripts": {
     "test": "mocha -R spec test/*-spec.js",
-    "build": "babel ./src --out-dir ./dist",
+    "build": "babel ./src --out-dir ./dist && uglifyjs ./dist/index.js -c toplevel,sequences=false -m reserved=['objectToStore','exports'] --toplevel -o ./dist/index.js",
     "prepublishOnly": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Raiondesu/object-to-vuex-store.git"
   },
+  "files": [
+    "./src",
+    "./dist",
+    ".babelrc"
+  ],
   "keywords": [
     "vue",
     "vuex",
@@ -45,9 +50,9 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-minify": "^0.2.0",
     "babel-preset-env": "^1.6.1",
     "mocha": "^4.0.1",
+    "uglify-js": "^3.1.5",
     "vue": "^2.5.2",
     "vuex": "^3.0.0"
   }

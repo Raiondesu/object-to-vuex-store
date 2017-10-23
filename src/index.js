@@ -11,63 +11,61 @@
  * @returns valid vuex store object for passing into a Vuex constructor.
  */
 exports.objectToStore = function(plain, namespaced) {
-  function filterObject(filter, define) {
+  function filterBy(wrap) {
     var result = {};
     for (let key in plain)
       if (valid(plain, key))
-        filter(plain, key) && define(result, plain, key);
+        wrap(result, plain, key);
     return result;
   }
 
   return {
     namespaced: !!namespaced,
-    state: filterObject(filters.state, defineProperty),
-    getters: filterObject(filters.getter, defineGetter),
-    mutations: filterObject(filters.mutation, defineMutation),
-    actions: filterObject(filters.action, defineAction)
+    state: filterBy(state),
+    getters: filterBy(getter),
+    mutations: filterBy(mutation),
+    actions: filterBy(action)
   };
 }
 
-const filters = {
-  state: (obj, prop) => !desc(obj, prop).get && !desc(obj, prop).set && typeof obj[prop] !== 'function',
-  getter: (obj, prop) => desc(obj, prop).get && !desc(obj, prop).set && typeof obj[prop] !== 'function',
-  mutation: (obj, prop) => !desc(obj, prop).get && desc(obj, prop).set && typeof obj[prop] !== 'function',
-  action: (obj, prop) => typeof obj[prop] === 'function'
-};
-
-function defineProperty(obj, donor, key) {
-  Object.defineProperty(obj, key, {
-    configurable: false,
-    enumerable: true,
-    get: () => donor[key],
-    set: value => donor[key] = value
-  });
+function state(obj, donor, key) {
+  if (!desc(donor, key).get && !desc(donor, key).set && typeof donor[key] !== 'function')
+    Object.defineProperty(obj, key, {
+      configurable: false,
+      enumerable: true,
+      get: () => donor[key],
+      set: value => donor[key] = value
+    });
 }
   
-function defineGetter(obj, donor, key) {
-  return obj[key] = () => donor[key];
+function getter(obj, donor, key) {
+  if (desc(donor, key).get && !desc(donor, key).set && typeof donor[key] !== 'function')
+    obj[key] = () => donor[key];
 }
 
-function defineMutation(obj, donor, key) {
-  return obj[key] = (state, payload) => donor[key] = payload;
+function mutation(obj, donor, key) {
+  if (!desc(donor, key).get && desc(donor, key).set && typeof donor[key] !== 'function')
+    obj[key] = (state, payload) => donor[key] = payload;
 }
 
-function defineAction(obj, donor, key) {
-  let args = getArgs(donor[key]);
-  obj[key] = (context, payload) => {
-    if (!donor.commit) {
-      donor.commit = context.commit;
-      donor.dispatch = context.dispatch;
-      donor.rootState = context.rootState;
-      donor.rootGetters = context.rootGetters;
+function action(obj, donor, key) {
+  if (typeof donor[key] === 'function') {
+    let args = getArgs(donor[key]);
+    obj[key] = (context, payload) => {
+      if (!donor.commit) {
+        donor.commit = context.commit;
+        donor.dispatch = context.dispatch;
+        donor.rootState = context.rootState;
+        donor.rootGetters = context.rootGetters;
+      }
+      
+      return donor[key].apply(
+        donor,
+        payload && payload.toString() === '[object Object]' && args.length > 1 ?
+          args.map(arg => payload[arg]) :
+          [payload]
+      );
     }
-    
-    return donor[key].apply(
-      donor,
-      payload && payload.toString() === '[object Object]' && args.length > 1 ?
-        args.map(arg => payload[arg]) :
-        [payload]
-    );
   }
 }
 
