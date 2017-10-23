@@ -139,7 +139,7 @@ const somePlainObject = {
 
   // Vuex's "natural" object arguments work too
   async AwaitAddToArray({ value, time }) {
-    // Yes, it works. *looking at vuex with judging eyes*
+    // Yes, it works.
     await this.dispatch('AddToArrayAsync', { value, time });
 
     // as well as this:
