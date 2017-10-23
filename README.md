@@ -16,7 +16,6 @@ namespace   | boolean  |   false   | Whether to namespace the object
 ```bash
 npm install --save object-to-vuex-store
 ```
-
 ```js
 // store.js
 
@@ -35,7 +34,7 @@ export default new Vuex({
     set setField(value) {
       this.field = value;
     },
-    async setFieldAsync(value, time) {
+    setFieldAsync(value, time) {
       setTimeout(() => {
         this.setField = value;
       }, time);
@@ -49,12 +48,20 @@ export default new Vuex({
 })
 ```
 
+### Conversion schema:  
+Input object field (plain) | Output object field (store)
+---------------------------|---------------
+field: ''                  | state.field  [get/set]  
+get Field()                | getters.Field  
+set setField(value)        | mutations.setField(state, value)  
+setFieldAsync(value, time) | actions.setFieldAsync(context, { value, time })  
 
 ```js
 // some component.vue
 ...
-await this.$store.dispatch('setFieldAsync', { value: 'foo', time: 1000 });
-console.log(this.$store.getters.Field) // logs "foo"
+this.$store.dispatch('setFieldAsync', { value: 'foo', time: 1000 }).then(() => {
+  console.log(this.$store.getters.Field) // logs "foo"
+});
 ...
 
 ```
