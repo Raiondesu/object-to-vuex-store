@@ -47,15 +47,6 @@ export default new Vuex({
   }
 })
 ```
-
-### Conversion schema:  
-Input object field (plain) | Output object field (store)
----------------------------|---------------
-field: ''                  | state.field  [get/set]  
-get Field()                | getters.Field  
-set setField(value)        | mutations.setField(state, value)  
-setFieldAsync(value, time) | actions.setFieldAsync(context, { value, time })  
-
 ```js
 // some component.vue
 ...
@@ -65,6 +56,18 @@ this.$store.dispatch('setFieldAsync', { value: 'foo', time: 1000 }).then(() => {
 ...
 
 ```
+
+### Conversion schema:
+(regarding the above example)  
+Input object field (plain) | Output object field (store)
+---------------------------|---------------
+field: ''                  | state.field  [get/set]  
+get Field()                | getters.Field  
+set setField(value)        | mutations.setField(state, value)  
+setFieldAsync(value, time) | actions.setFieldAsync(context, { value, time })  
+
+-------------------------
+-------------------------
 
 ## Description & under-the-hood principles
 
