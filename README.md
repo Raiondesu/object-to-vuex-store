@@ -1,8 +1,12 @@
 # object-to-vuex-store
-## [![Travis branch](https://img.shields.io/travis/Raiondesu/object-to-vuex-store/master.svg?style=flat-square)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square) ![size](https://badges.herokuapp.com/size/npm/object-to-vuex-store@latest/dist/index.js?style=flat-square&gzip=true) [![David](https://img.shields.io/david/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![David](https://img.shields.io/david/dev/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dt/object-to-vuex-store.svg?style=flat-square)](http://npmjs.com/package/object-to-vuex-store)
+## [![Travis branch](https://img.shields.io/travis/Raiondesu/object-to-vuex-store/master.svg?style=flat-square)](https://travis-ci.org/Raiondesu/object-to-vuex-store) ![size](https://badges.herokuapp.com/size/github/Raiondesu/object-to-vuex-store/master/dist/index.js?style=flat-square) ![size](https://badges.herokuapp.com/size/github/Raiondesu/object-to-vuex-store/master/dist/index.js?style=flat-square&gzip=true) [![David](https://img.shields.io/david/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![David](https://img.shields.io/david/dev/raiondesu/object-to-vuex-store.svg?style=flat-square)]() [![npm](https://img.shields.io/npm/dt/object-to-vuex-store.svg?style=flat-square)](http://npmjs.com/package/object-to-vuex-store)
 
 This library provides a seamless conversion from a plain JS-object into a Vuex-valid store/module.
 It contains only one function: `objectToStore` that does all the job.
+
+## Warning!!!
+This is a highly compressed version of the original lib with less features!
+If you want to use the full version - go to [master branch](https://github.com/Raiondesu/object-to-vuex-store)!
 
 ## Parameters
 
@@ -34,7 +38,8 @@ export default new Vuex({
     set setField(value) {
       this.field = value;
     },
-    setFieldAsync(value, time) {
+    // Caveat: only single or destructured arguments allowed!
+    setFieldAsync({ value, time }) {
       setTimeout(() => {
         this.setField = value;
       }, time);
@@ -82,8 +87,8 @@ while maintaining consistency and simplicity of plain JS objects.
 This way Vuex is tricked to think that it has just its conventional object to work with,
 whereas it just calls functions that internally reference your object.
 
-All Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object.  
-More than that - you can also grasp all the benefits of Vuex's `rootState` and `rootGetters` (also `commit` and `dispatch`) in your modules, since these are added dynamically to the context of your functions upon invocation!
+Allmost all Vuex caveats are also removed as a bonus that comes with this type of under-the-hood behaviour - you can use all your properties, getters, setters and methods wherever you want in your object.  
+The only vuex caveat left is that actions can only have 1 argument.
 
 ### Deep-Example
 
@@ -95,55 +100,38 @@ const somePlainObject = {
   field: '',
 
   // Each getter GETTER_NAME converts into a vuex getter
-  get Foo() {
-    return this.array[0];
-  },
-
-  // Getter as "computed property" with additional argument
   get ArrayElement() {
     return index => this.array[index];
   }
 
+  get Foo() {
+    return this.array[0];
+  },
+
   // Each setter SETTER_NAME converts into a vuex mutation
   // and is accessible via store.commit('SETTER_NAME', payload)
+  set Foo(value) {
+    return this.array[0] = value;
+  },
+
   set AddToArray(value) {
     this.array.push(value);
   },
 
-  // Caveat: getters and setters cannot have equal names!
-  // this one would override the 'Foo' getter!
-  // set Foo(value) {
-  //   return this.array[0] = value;
-  // },
-
   // Each method (async included) is converted into a dispatchable vuex action.
-  async AddToArrayAsync(value, time) {
+  async AddToArrayAsync({ value, time }) {
     setTimeout(() => {
       // You can do this:
       this.AddToArray = value;
       // vuex will not register this as a commit,
       // while still updating the storage, whatsoever.
-
-      // but you might as well do:
-      this.commit('AddToArray', value);
-      // since there is no practical difference.
     }, time);
-
-    // Also you can use rootGetters, rootState, commit and dispatch,
-    // as if they were on your object:
-    console.log(this.rootState);    // logs all root properties
-    console.log(this.rootGetters);  // logs all root getters
-    console.log(this.commit);       // logs function boundCommit(type, payload) {}
-    console.log(this.dispatch);     // logs function boundDispatch(type, payload) {}
   },
 
-  // Vuex's "natural" object arguments work too
+  // Vuex's "natural" destructured arguments
   async AwaitAddToArray({ value, time }) {
     // Yes, it works.
-    await this.dispatch('AddToArrayAsync', { value, time });
-
-    // as well as this:
-    await this.AddToArrayAsync(value, time);
+    await this.AddToArrayAsync({ value, time });
   }
 }
 
@@ -174,6 +162,9 @@ const storeObject = objectToStore(somePlainObject, /*namespaced:*/ false);
   },
 
   mutations: {
+    Foo(state, value) {
+      someOtherPlainObject.Foo = value;
+    },
     AddToArray(state, value) {
       // It's not literally like this but the principle is the same,
       // with difference being that the setter is binded BEFORE invocation
@@ -185,7 +176,7 @@ const storeObject = objectToStore(somePlainObject, /*namespaced:*/ false);
   // Actions are as simple as that:
   actions: {
     async AddToArrayAsync(context, { value, time }) {
-      somePlainObject.AddToArrayAsync(value, time);
+      somePlainObject.AddToArrayAsync({ value, time });
     },
     async AwaitAddToArray(context, payload) {
       somePlainObject.AwaitAddToArray(payload);

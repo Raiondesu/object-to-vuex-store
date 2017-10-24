@@ -98,7 +98,7 @@ describe('objectToStore', function() {
 			},
 			primitiveString: 'haha',
 			primitiveNumber: 9,
-			get nine() {
+			get number() {
 				return this.primitiveNumber;
 			},
 			set haha(value) {
@@ -111,7 +111,7 @@ describe('objectToStore', function() {
 				this.primitiveNumber = value;
 			},
 			set thirtythree(value) {
-				this.someObj.value = value - this.nine;
+				this.someObj.value = value - this.number;
 			}
 		};
 
@@ -182,8 +182,8 @@ describe('objectToStore', function() {
 				return this.nine;
 			},
 			
-			addInto33(/* the first number to add */number1, /* the second number to add */number2) {
-				this.commit('thirtythree', number1 + number2);
+			addInto33({/* the first number to add */number1, /* the second number to add */number2}) {
+				this.thirtythree = number1 + number2;
 				return this.someObj.value;
 			},
 
@@ -313,7 +313,7 @@ describe('objectToStore', function() {
 		  
 			  try {
 				let data = { access_token: 'asdasd', refresh_token: 'dsadsa' };
-				this.commit('setTokens', { access: data['access_token'], refresh: data['refresh_token'] });
+				this.setTokens = { access: data['access_token'], refresh: data['refresh_token'] };
 				return true;
 			  }
 			  catch (e) {
